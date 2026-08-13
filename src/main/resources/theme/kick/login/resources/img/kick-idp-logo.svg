@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Generic placeholder mark for the Kick identity provider button.
+
+  This is NOT the Kick trademark. It is a plain geometric "K" glyph shipped so the provider has
+  a usable default icon without this repository redistributing a third-party brand asset under
+  Apache-2.0.
+
+  To display the official Kick logo, replace this file in your own login theme and comply with
+  Kick's brand guidelines and trademark policy. See README.md -> "Provider icon".
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-hidden="true">
+  <rect width="32" height="32" rx="7" fill="#0F1014"/>
+  <path fill="#53FC18" d="M8 7h5v6h2V9h2V7h6v6h-2v2h-2v2h2v2h2v6h-6v-2h-2v-4h-2v6H8z"/>
+</svg>

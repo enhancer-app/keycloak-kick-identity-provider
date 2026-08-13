@@ -1,0 +1,13 @@
+# Local development only. It does not contain a realm import, OAuth application, client secret,
+# database or production deployment assumption. The Keycloak admin user below is intentionally a
+# disposable development credential; override or remove it before exposing the service.
+services:
+  keycloak:
+    build:
+      context: .
+    command: start-dev
+    ports:
+      - "8080:8080"
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: change-me-before-use

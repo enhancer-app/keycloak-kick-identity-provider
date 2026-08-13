@@ -1,0 +1,10 @@
+.git
+.github
+.gradle
+# Keep only the assembled provider JAR in Docker's build context.
+build/**
+!build/libs/keycloak-kick-identity-provider-*.jar
+docs
+src/test
+*.iml
+.idea

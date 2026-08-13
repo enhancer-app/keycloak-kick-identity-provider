@@ -1,0 +1,33 @@
+/*
+ * Icon for the Kick identity provider button on the login screen.
+ *
+ * Rendered by social-providers.ftl as:
+ *     <span class="kc-social-kick">Kick</span>
+ *
+ * The provider display name is kept in the DOM for screen readers and is visually replaced by
+ * the icon, rather than being removed, so the button stays accessible.
+ */
+.kc-social-kick {
+    display: inline-block;
+    width: 1.5rem;
+    height: 1.5rem;
+    background-image: url("../img/kick-idp-logo.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+
+    /* Visually hide the label text while leaving it available to assistive technology. */
+    text-indent: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+@media (forced-colors: active) {
+    /* Background images are dropped in forced-colors mode; restore the readable text label. */
+    .kc-social-kick {
+        background-image: none;
+        text-indent: 0;
+        width: auto;
+        overflow: visible;
+    }
+}
