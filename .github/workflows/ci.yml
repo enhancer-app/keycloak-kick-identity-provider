@@ -26,7 +26,7 @@ jobs:
       - name: Make Gradle Wrapper executable
         run: chmod +x gradlew
       - name: Build and test
-        run: ./gradlew clean verify --no-daemon
+        run: ./gradlew clean build --no-daemon
       - name: Upload provider JAR
         uses: actions/upload-artifact@v4
         with:
