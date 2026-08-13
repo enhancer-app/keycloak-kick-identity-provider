@@ -21,8 +21,12 @@ jobs:
           cache: gradle
       - name: Verify wrapper integrity
         uses: gradle/actions/wrapper-validation@v4
+      - name: Make Gradle Wrapper executable
+        run: chmod +x gradlew
       - name: Build, unit test, and smoke test
-        run: ./gradlew clean build test -PwithSmoke --no-daemon -Pversion="${GITHUB_REF_NAME#v}"
+        run: ./gradlew clean verify test -PwithSmoke --no-daemon -Pversion="${GITHUB_REF_NAME#v}"
+      - name: Create SHA-256 checksum
+        run: sha256sum build/libs/keycloak-kick-identity-provider-*.jar > build/libs/keycloak-kick-identity-provider.jar.sha256
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
@@ -31,3 +35,4 @@ jobs:
             build/libs/keycloak-kick-identity-provider-*.jar
             build/libs/keycloak-kick-identity-provider-*-sources.jar
             build/libs/keycloak-kick-identity-provider-*-javadoc.jar
+            build/libs/keycloak-kick-identity-provider.jar.sha256
