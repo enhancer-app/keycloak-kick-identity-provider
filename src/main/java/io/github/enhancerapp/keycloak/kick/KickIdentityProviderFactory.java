@@ -46,7 +46,7 @@ public class KickIdentityProviderFactory extends AbstractIdentityProviderFactory
     @Override
     public KickIdentityProviderConfig createConfig() {
         KickIdentityProviderConfig config = new KickIdentityProviderConfig();
-        config.applyFixedSettings();
+        config.applyDefaults();
         return config;
     }
 
@@ -60,32 +60,12 @@ public class KickIdentityProviderFactory extends AbstractIdentityProviderFactory
     @Override
     public List<ProviderConfigProperty> getConfigProperties() {
         return ProviderConfigurationBuilder.create()
-                .property()
-                    .name(KickIdentityProviderConfig.IMPORT_EMAIL)
-                    .label("Import e-mail")
-                    .helpText("Copy the Kick account e-mail into the Keycloak user profile. "
-                            + "Disabled by default: Kick does not assert that the address is verified, "
-                            + "so importing it can silently link a Kick account to an existing Keycloak "
-                            + "user with the same address.")
-                    .type(ProviderConfigProperty.BOOLEAN_TYPE)
-                    .defaultValue(false)
-                    .add()
-                .property()
-                    .name(KickIdentityProviderConfig.STORE_AVATAR)
-                    .label("Store profile picture")
-                    .helpText("Store the Kick profile picture URL as a user attribute.")
-                    .type(ProviderConfigProperty.BOOLEAN_TYPE)
-                    .defaultValue(true)
-                    .add()
-                .property()
-                    .name(KickIdentityProviderConfig.AVATAR_ATTRIBUTE)
-                    .label("Profile picture attribute")
-                    .helpText("User attribute receiving the profile picture URL. Defaults to '"
-                            + KickIdentityProviderConfig.DEFAULT_AVATAR_ATTRIBUTE + "'. "
-                            + "Only absolute http/https URLs are stored.")
-                    .type(ProviderConfigProperty.STRING_TYPE)
-                    .defaultValue(KickIdentityProviderConfig.DEFAULT_AVATAR_ATTRIBUTE)
-                    .add()
+                .property().name("authorizationUrl").label("Authorization URL")
+                    .type(ProviderConfigProperty.STRING_TYPE).defaultValue(KickEndpoints.AUTHORIZATION_URL).add()
+                .property().name("tokenUrl").label("Token URL")
+                    .type(ProviderConfigProperty.STRING_TYPE).defaultValue(KickEndpoints.TOKEN_URL).add()
+                .property().name("userInfoUrl").label("Profile URL")
+                    .type(ProviderConfigProperty.STRING_TYPE).defaultValue(KickEndpoints.PROFILE_URL).add()
                 .property()
                     .name(KickIdentityProviderConfig.USERNAME_STRATEGY)
                     .label("Username strategy")

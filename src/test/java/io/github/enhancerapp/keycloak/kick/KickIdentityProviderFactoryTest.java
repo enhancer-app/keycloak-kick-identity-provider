@@ -33,8 +33,6 @@ class KickIdentityProviderFactoryTest {
         assertThat(config.isPkceEnabled()).isTrue();
         assertThat(config.getPkceMethod()).isEqualTo("S256");
         assertThat(config.getDefaultScope()).isEqualTo("user:read");
-        assertThat(config.isImportEmail()).isFalse();
-        assertThat(config.isStoreAvatar()).isTrue();
     }
 
     @Test
@@ -43,12 +41,11 @@ class KickIdentityProviderFactoryTest {
                 .collect(Collectors.toMap(ProviderConfigProperty::getName, property -> property));
 
         assertThat(properties).containsOnlyKeys(
-                KickIdentityProviderConfig.IMPORT_EMAIL,
-                KickIdentityProviderConfig.STORE_AVATAR,
-                KickIdentityProviderConfig.AVATAR_ATTRIBUTE,
+                "authorizationUrl",
+                "tokenUrl",
+                "userInfoUrl",
                 KickIdentityProviderConfig.USERNAME_STRATEGY,
                 KickIdentityProviderConfig.USERNAME_PREFIX);
-        assertThat(properties).doesNotContainKeys("authorizationUrl", "tokenUrl", "userInfoUrl");
     }
 
     @Test
@@ -56,10 +53,7 @@ class KickIdentityProviderFactoryTest {
         Map<String, ProviderConfigProperty> properties = factory.getConfigProperties().stream()
                 .collect(Collectors.toMap(ProviderConfigProperty::getName, property -> property));
 
-        assertThat(properties.get(KickIdentityProviderConfig.IMPORT_EMAIL).getDefaultValue()).isEqualTo(false);
-        assertThat(properties.get(KickIdentityProviderConfig.STORE_AVATAR).getDefaultValue()).isEqualTo(true);
-        assertThat(properties.get(KickIdentityProviderConfig.AVATAR_ATTRIBUTE).getDefaultValue())
-                .isEqualTo("kick_profile_picture");
+        assertThat(properties.get("authorizationUrl").getDefaultValue()).isEqualTo(KickEndpoints.AUTHORIZATION_URL);
         assertThat(properties.get(KickIdentityProviderConfig.USERNAME_STRATEGY).getDefaultValue())
                 .isEqualTo("stable-id-prefix");
         assertThat(properties.get(KickIdentityProviderConfig.USERNAME_PREFIX).getDefaultValue()).isEqualTo("kick-");

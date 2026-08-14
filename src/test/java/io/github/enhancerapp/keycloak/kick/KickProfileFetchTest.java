@@ -146,10 +146,10 @@ class KickProfileFetchTest {
         }
 
         @Test
-        void doesNotImportTheEmailByDefault() {
+        void importsEmailOnEveryLogin() {
             kick.respondWith(200, VALID_PROFILE);
 
-            assertThat(provider().doGetFederatedIdentity("access-token").getEmail()).isNull();
+            assertThat(provider().doGetFederatedIdentity("access-token").getEmail()).isEqualTo("user@example.com");
         }
 
         @Test
@@ -169,7 +169,7 @@ class KickProfileFetchTest {
 
             BrokeredIdentityContext context = provider().doGetFederatedIdentity("access-token");
 
-            assertThat(context.getUserAttribute("kick_profile_picture"))
+            assertThat(context.getUserAttribute("kick.profile_image_url"))
                     .isEqualTo("https://files.kick.com/avatar.png");
         }
 
@@ -181,8 +181,7 @@ class KickProfileFetchTest {
                     Map.of(KickIdentityProviderConfig.AVATAR_ATTRIBUTE, "picture"))
                     .doGetFederatedIdentity("access-token");
 
-            assertThat(context.getUserAttribute("picture")).isEqualTo("https://files.kick.com/avatar.png");
-            assertThat(context.getUserAttribute("kick_profile_picture")).isNull();
+            assertThat(context.getUserAttribute("kick.profile_image_url")).isEqualTo("https://files.kick.com/avatar.png");
         }
 
         @Test
@@ -193,7 +192,7 @@ class KickProfileFetchTest {
                     Map.of(KickIdentityProviderConfig.STORE_AVATAR, "false"))
                     .doGetFederatedIdentity("access-token");
 
-            assertThat(context.getUserAttribute("kick_profile_picture")).isNull();
+            assertThat(context.getUserAttribute("kick.profile_image_url")).isEqualTo("https://files.kick.com/avatar.png");
         }
 
         @Test

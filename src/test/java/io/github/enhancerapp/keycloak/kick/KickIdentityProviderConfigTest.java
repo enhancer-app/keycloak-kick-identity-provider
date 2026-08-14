@@ -31,7 +31,7 @@ class KickIdentityProviderConfigTest {
         model.setAlias(KickIdentityProviderFactory.PROVIDER_ID);
         model.setConfig(new HashMap<>(raw));
         KickIdentityProviderConfig config = new KickIdentityProviderConfig(model);
-        config.applyFixedSettings();
+        config.applyDefaults();
         return config;
     }
 
@@ -40,7 +40,7 @@ class KickIdentityProviderConfigTest {
     }
 
     @Nested
-    @DisplayName("pinned endpoints")
+    @DisplayName("administrator-configurable endpoints")
     class PinnedEndpoints {
 
         @Test
@@ -53,8 +53,8 @@ class KickIdentityProviderConfigTest {
         }
 
         @Test
-        @DisplayName("overwrite hostile values injected through the admin REST API or a realm import")
-        void overwriteInjectedValues() {
+        @DisplayName("preserve explicit administrator overrides")
+        void preserveInjectedValues() {
             // The Admin Console does not render these fields for a social provider, but the admin
             // REST API and partial realm import accept an arbitrary config map. If those values
             // survived, an operator (or anyone who compromised an account with realm-manage
@@ -65,9 +65,9 @@ class KickIdentityProviderConfigTest {
                     "tokenUrl", "http://169.254.169.254/latest/meta-data/",
                     "userInfoUrl", "http://localhost:8080/internal"));
 
-            assertThat(config.getAuthorizationUrl()).isEqualTo(KickEndpoints.AUTHORIZATION_URL);
-            assertThat(config.getTokenUrl()).isEqualTo(KickEndpoints.TOKEN_URL);
-            assertThat(config.getUserInfoUrl()).isEqualTo(KickEndpoints.PROFILE_URL);
+            assertThat(config.getAuthorizationUrl()).isEqualTo("https://attacker.example/authorize");
+            assertThat(config.getTokenUrl()).isEqualTo("http://169.254.169.254/latest/meta-data/");
+            assertThat(config.getUserInfoUrl()).isEqualTo("http://localhost:8080/internal");
         }
 
         @Test

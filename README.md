@@ -18,8 +18,7 @@ any Keycloak deployment that runs a supported Keycloak version.
 ## Features
 
 - OAuth 2.1 authorization-code flow with mandatory PKCE `S256`.
-- Fixed, non-configurable Kick endpoints. No endpoint override means no accidental credential
-  exfiltration and no SSRF configuration surface.
+- Default Kick endpoints, configurable by realm administrators for controlled proxy/test deployments.
 - Native Keycloak social-provider registration (`Kick` in Admin Console).
 - Stable federated identity subject from only `data[0].user_id`.
 - Optional e-mail import, avatar user attribute, declarative JSON attribute mapper, and two
@@ -117,8 +116,8 @@ In **Identity providers → Kick**, configure:
 | Username strategy | `stable-id-prefix` | `kick-{user_id}` by default; safest across profile changes. |
 | Username prefix | `kick-` | Used only by `stable-id-prefix`. |
 
-The provider intentionally does **not** offer authorization, token or profile endpoint settings.
-They are permanently set to:
+The provider starts with these endpoint defaults; realm administrators may override them for
+controlled proxy/test deployments:
 
 ```text
 Authorization: https://id.kick.com/oauth/authorize
@@ -160,10 +159,10 @@ Kick returns a payload shaped like:
 
 | Kick field | Keycloak use | Identity-critical? |
 | --- | --- | --- |
-| `data[0].user_id` | Federated identity subject and default username source | **Yes. The only identity key.** |
-| `data[0].name` | Provider profile data available to the Kick user attribute mapper; username only when `provider-username` is selected | No; mutable. |
-| `data[0].email` | Keycloak e-mail only when **Import e-mail** is enabled | No; optional. |
-| `data[0].profile_picture` | Configured user attribute when avatar storage is enabled | No; optional and mutable. |
+| `data[0].user_id` | Federated identity subject; `kick.id` attribute | **Yes. The only identity key.** |
+| `data[0].name` | `kick.login` and `kick.display_name`; source for optional `provider-username` | No; mutable. |
+| `data[0].email` | Keycloak email and `kick.email` when supplied | No; optional. |
+| `data[0].profile_picture` | `kick.profile_image_url` when supplied | No; optional and mutable. |
 
 The provider never uses e-mail, name/login, channel name or avatar as a federated identity key.
 It never guesses a first or last name because Kick does not provide reliable values for either.

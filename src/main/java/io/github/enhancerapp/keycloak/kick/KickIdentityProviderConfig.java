@@ -64,10 +64,16 @@ public class KickIdentityProviderConfig extends OAuth2IdentityProviderConfig {
      *       empty, because Kick rejects an authorization request with no scope.</li>
      * </ul>
      */
-    public void applyFixedSettings() {
-        setAuthorizationUrl(KickEndpoints.AUTHORIZATION_URL);
-        setTokenUrl(KickEndpoints.TOKEN_URL);
-        setUserInfoUrl(KickEndpoints.PROFILE_URL);
+    public void applyDefaults() {
+        if (getAuthorizationUrl() == null || getAuthorizationUrl().isBlank()) {
+            setAuthorizationUrl(KickEndpoints.AUTHORIZATION_URL);
+        }
+        if (getTokenUrl() == null || getTokenUrl().isBlank()) {
+            setTokenUrl(KickEndpoints.TOKEN_URL);
+        }
+        if (getUserInfoUrl() == null || getUserInfoUrl().isBlank()) {
+            setUserInfoUrl(KickEndpoints.PROFILE_URL);
+        }
 
         setPkceEnabled(true);
         setPkceMethod(OAuth2Constants.PKCE_METHOD_S256);

@@ -17,7 +17,6 @@ import org.keycloak.broker.social.SocialIdentityProvider;
 import org.keycloak.events.EventBuilder;
 import org.keycloak.http.simple.SimpleHttp;
 import org.keycloak.http.simple.SimpleHttpResponse;
-import org.keycloak.models.IdentityProviderSyncMode;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
@@ -74,7 +73,7 @@ public class KickIdentityProvider extends AbstractOAuth2IdentityProvider<KickIde
 
     public KickIdentityProvider(KeycloakSession session, KickIdentityProviderConfig config) {
         super(session, config);
-        config.applyFixedSettings();
+        config.applyDefaults();
         if (config.isStoreToken() == null) {
             // Keep the standard Keycloak behavior, but make its default explicit for a newly
             // created provider. Token storage remains an administrator-controlled checkbox.
@@ -212,12 +211,12 @@ public class KickIdentityProvider extends AbstractOAuth2IdentityProvider<KickIde
         // lastName="Baz". The current Kick name is instead exposed as provider profile data below,
         // where an administrator can map it deliberately. See README "Profile field mapping".
 
-        if (config.isImportEmail()) {
-            user.setEmail(profile.email());
-        }
-        if (config.isStoreAvatar() && profile.profilePicture() != null) {
-            user.setUserAttribute(config.getAvatarAttribute(), profile.profilePicture());
-        }
+        user.setEmail(profile.email());
+        user.setUserAttribute("kick.id", profile.userId());
+        setOptional(user, "kick.login", profile.name());
+        setOptional(user, "kick.display_name", profile.name());
+        setOptional(user, "kick.email", profile.email());
+        setOptional(user, "kick.profile_image_url", profile.profilePicture());
 
         // Makes the raw profile document available to declarative attribute mappers.
         AbstractJsonUserAttributeMapper.storeUserProfileForMapper(user, profileJson, config.getAlias());
@@ -227,29 +226,30 @@ public class KickIdentityProvider extends AbstractOAuth2IdentityProvider<KickIde
 
     @Override
     public void importNewUser(KeycloakSession session, RealmModel realm, UserModel user, BrokeredIdentityContext context) {
-        applyAvatar(user, context);
+        synchronizeProfile(user, context);
     }
 
     @Override
     public void updateBrokeredUser(KeycloakSession session, RealmModel realm, UserModel user, BrokeredIdentityContext context) {
-        // IMPORT sync mode means "populate once"; re-writing the attribute on every login would
-        // silently override a value an administrator or the user has since changed.
-        if (getConfig().getSyncMode() == IdentityProviderSyncMode.FORCE) {
-            applyAvatar(user, context);
-        }
+        synchronizeProfile(user, context);
     }
 
-    private void applyAvatar(UserModel user, BrokeredIdentityContext context) {
-        KickIdentityProviderConfig config = getConfig();
-        if (!config.isStoreAvatar()) {
-            return;
-        }
-        String attribute = config.getAvatarAttribute();
+    private void synchronizeProfile(UserModel user, BrokeredIdentityContext context) {
+        user.setEmail(context.getEmail());
+        synchronizeAttribute(user, context, "kick.id");
+        synchronizeAttribute(user, context, "kick.login");
+        synchronizeAttribute(user, context, "kick.display_name");
+        synchronizeAttribute(user, context, "kick.email");
+        synchronizeAttribute(user, context, "kick.profile_image_url");
+    }
+
+    private static void synchronizeAttribute(UserModel user, BrokeredIdentityContext context, String attribute) {
         String value = context.getUserAttribute(attribute);
-        if (value == null || value.isBlank()) {
-            user.removeAttribute(attribute);
-        } else {
-            user.setSingleAttribute(attribute, value);
-        }
+        if (value == null || value.isBlank()) user.removeAttribute(attribute);
+        else user.setSingleAttribute(attribute, value);
+    }
+
+    private static void setOptional(BrokeredIdentityContext context, String attribute, String value) {
+        if (value != null) context.setUserAttribute(attribute, value);
     }
 }
