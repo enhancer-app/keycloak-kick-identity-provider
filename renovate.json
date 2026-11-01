@@ -1,0 +1,61 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", ":semanticCommits", ":semanticCommitTypeAll(chore)"],
+  "baseBranchPatterns": ["master"],
+  "timezone": "Europe/Warsaw",
+  "schedule": ["* 0-5 * * 1"],
+  "dependencyDashboard": true,
+  "labels": ["dependencies"],
+  "enabledManagers": ["gradle", "gradle-wrapper", "dockerfile", "github-actions"],
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": ["security"],
+    "vulnerabilityFixStrategy": "highest"
+  },
+  "osvVulnerabilityAlerts": true,
+  "packageRules": [
+    {
+      "matchManagers": ["gradle", "gradle-wrapper"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "gradle non-major dependencies"
+    },
+    {
+      "matchManagers": ["dockerfile"],
+      "matchUpdateTypes": ["minor", "patch", "digest"],
+      "groupName": "docker non-major images"
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["minor", "patch", "digest"],
+      "groupName": "github actions non-major"
+    },
+    {
+      "description": "Keycloak libraries and the Keycloak image move together, apart from other dependencies",
+      "matchPackageNames": ["org.keycloak:**", "quay.io/keycloak/keycloak"],
+      "matchUpdateTypes": ["minor", "patch", "digest"],
+      "groupName": "keycloak"
+    },
+    {
+      "description": "A Keycloak major gets its own PR; check the SPI changes before merging",
+      "matchPackageNames": ["org.keycloak:**", "quay.io/keycloak/keycloak"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "keycloak major"
+    },
+    {
+      "description": "RESTEasy must match the version shipped by the target Keycloak; bump it by hand with Keycloak",
+      "matchPackageNames": ["org.jboss.resteasy:**"],
+      "enabled": false
+    },
+    {
+      "description": "CI runs the JDK of the Gradle toolchain (17); change both by hand",
+      "matchDepNames": ["java-jdk"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    },
+    {
+      "description": "Vulnerability fixes already skip the schedule and limits; also put them first",
+      "matchJsonata": ["$exists(vulnerabilityFixVersion)"],
+      "prPriority": 10
+    }
+  ]
+}
