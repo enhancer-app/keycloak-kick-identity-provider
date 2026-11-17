@@ -1,0 +1,6 @@
+# tidy (https://github.com/enhancer-app/tidy) triages issues, proposes fixes and reviews pull requests here.
+review:
+  # Run on the pull request's code in a container without secrets; the reviewer reads the output.
+  # The Keycloak discovery smoke test (-PwithSmoke) needs Docker, so it stays in CI only.
+  checks: ["bash gradlew clean build --no-daemon"]
+  image: eclipse-temurin:17-jdk
